@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Room Reset">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F3ECFF">
+<link rel="apple-touch-icon" href="../assets/icon-180.png">
+<link rel="icon" type="image/png" href="../assets/icon-512.png">
+<title>Room Reset</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: one friendly column sized for an iPad; each room zone is a card with its own mascot; a sticky progress strip; big finish button at the end. */
+:root{
+  --bg:#F3ECFF; --bg-dot:#E4D5FF; --card:#FFFFFF; --ink:#2E1452; --ink-soft:#6A4E95; --line:#DCCBFA;
+  --accent:#7C3AED; --accent-deep:#5B21B6; --accent-soft:#C9B0FF; --lilac:#EEE4FF; --done-bg:#F6F0FF;
+  --on-accent:#FFFFFF; --good:#2F9E6B;
+  --petal:#F59AC9; --sun:#FFD65C; --pup:#E9BC8C; --pup-ear:#B07A4F; --cat:#C3AEEA; --cat-dark:#9277C9;
+  --squish:#FFC2D6; --mint:#A6E8CE; --face:#3A1F5C; --blush:#FF8FB3; --white:#FFFFFF;
+  --font-display:"Grandstander","Comic Sans MS","Chalkboard SE",system-ui,sans-serif;
+  --font-body:"Nunito",ui-rounded,"SF Pro Rounded",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#170D2A; --bg-dot:#24163F; --card:#251741; --ink:#F3EAFF; --ink-soft:#BCA7E2; --line:#3E2B66;
+  --accent:#B48CFF; --accent-deep:#D6BEFF; --accent-soft:#5A3A99; --lilac:#2F1F52; --done-bg:#2C1C4C;
+  --on-accent:#1B0D33; --good:#6FD6A6; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#170D2A; --bg-dot:#24163F; --card:#251741; --ink:#F3EAFF; --ink-soft:#BCA7E2; --line:#3E2B66;
+  --accent:#B48CFF; --accent-deep:#D6BEFF; --accent-soft:#5A3A99; --lilac:#2F1F52; --done-bg:#2C1C4C;
+  --on-accent:#1B0D33; --good:#6FD6A6; color-scheme:dark;
+}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;
+  background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:18px; line-height:1.45;
+  background-image:radial-gradient(var(--bg-dot) 2.5px, transparent 3px), radial-gradient(var(--bg-dot) 2.5px, transparent 3px);
+  background-size:44px 44px; background-position:0 0, 22px 22px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:20px 48px;
+}
+.wrap{max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:20px}
+svg.ic{display:block; flex:none}
+
+/* Header */
+.hero{position:relative; background:var(--card); border:3px solid var(--line); border-radius:28px; padding:22px 22px 18px; display:flex; align-items:center; gap:16px; overflow:hidden}
+.hero h1{font-family:var(--font-display); font-weight:800; font-size:clamp(30px,6vw,44px); line-height:1.05; margin:0; color:var(--accent-deep); text-wrap:balance}
+.hero p{margin:6px 0 0; color:var(--ink-soft); font-weight:700}
+.hero .text{flex:1; min-width:0}
+.hero .pals{display:flex; align-items:flex-end; gap:4px}
+.hero .deco{position:absolute; opacity:.9}
+@media (max-width:520px){.hero{flex-direction:column; align-items:flex-start}.hero .pals{align-self:flex-end; margin-top:-10px}}
+
+/* Progress */
+.progress{position:sticky; top:env(safe-area-inset-top, 0px); z-index:5; background:var(--card); border:3px solid var(--line); border-radius:22px; padding:12px 16px; display:flex; align-items:center; gap:14px; box-shadow:0 6px 18px -10px rgba(60,20,120,.35)}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); z-index:10; background:var(--bg)}
+.bar{flex:1; min-width:0}
+.bar-top{display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-weight:800}
+.bar-top .count{font-variant-numeric:tabular-nums; color:var(--accent-deep)}
+.track{height:18px; border-radius:99px; background:var(--lilac); margin-top:6px; overflow:hidden; border:2px solid var(--line)}
+.fill{height:100%; width:0; border-radius:99px; background:repeating-linear-gradient(-45deg, var(--accent) 0 12px, var(--accent-deep) 12px 24px); transition:width .4s cubic-bezier(.3,1.4,.5,1)}
+.stickers{display:flex; gap:4px}
+.sticker{width:38px; height:38px; border-radius:50%; background:var(--lilac); display:grid; place-items:center; filter:grayscale(1); opacity:.45; transition:all .3s}
+.sticker.got{filter:none; opacity:1; background:var(--done-bg); transform:scale(1.08)}
+@media (max-width:560px){.stickers{display:none}}
+
+/* Zones */
+.zone{background:var(--card); border:3px solid var(--line); border-radius:28px; padding:18px 18px 10px}
+.zone.complete{border-color:var(--accent-soft); background:var(--done-bg)}
+.zone-head{display:flex; align-items:center; gap:12px; margin-bottom:6px}
+.zone-head h2{font-family:var(--font-display); font-weight:800; font-size:26px; margin:0; color:var(--accent-deep); line-height:1.1}
+.zone-head .tip{margin:2px 0 0; color:var(--ink-soft); font-size:16px; font-weight:700}
+.zone-head .htext{flex:1; min-width:0}
+.zone-badge{font-weight:800; font-size:15px; padding:4px 12px; border-radius:99px; background:var(--lilac); color:var(--accent-deep); white-space:nowrap; font-variant-numeric:tabular-nums}
+.zone.complete .zone-badge{background:var(--accent); color:var(--on-accent)}
+ul.tasks{list-style:none; margin:0; padding:0}
+.task{display:flex; align-items:center; gap:14px; width:100%; text-align:left; background:none; border:0; border-top:2px dashed var(--line); padding:14px 4px; font:inherit; color:inherit; font-weight:700; cursor:pointer; -webkit-tap-highlight-color:transparent; min-height:64px}
+li:first-child .task{border-top:0}
+.task:focus-visible{outline:3px solid var(--accent); outline-offset:2px; border-radius:14px}
+.box{width:44px; height:44px; flex:none; border-radius:50%; border:3px solid var(--accent-soft); background:var(--card); display:grid; place-items:center; transition:transform .2s, background .2s, border-color .2s}
+.box svg{opacity:0; transform:scale(.3); transition:all .25s cubic-bezier(.3,1.6,.5,1)}
+.task[aria-checked="true"] .box{background:var(--sun); border-color:var(--sun)}
+.task[aria-checked="true"] .box svg{opacity:1; transform:scale(1)}
+.task[aria-checked="true"] .label{text-decoration:line-through; text-decoration-color:var(--accent-soft); text-decoration-thickness:3px; color:var(--ink-soft)}
+.task:active .box{transform:scale(.9)}
+.label{flex:1; min-width:0}
+.label small{display:block; font-weight:600; color:var(--ink-soft); font-size:15px}
+
+/* Finish */
+.finish{background:var(--card); border:3px solid var(--line); border-radius:28px; padding:22px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:12px}
+.finish h2{font-family:var(--font-display); font-weight:800; font-size:30px; margin:0; color:var(--accent-deep); text-wrap:balance}
+.finish p{margin:0; color:var(--ink-soft); font-weight:700}
+.note-wrap{width:100%; max-width:480px; text-align:left}
+.note-wrap label{font-weight:800; font-size:16px; color:var(--ink-soft)}
+textarea, input[type=email]{width:100%; font:inherit; font-size:17px; color:var(--ink); background:var(--lilac); border:2px solid var(--line); border-radius:16px; padding:12px 14px; margin-top:4px}
+textarea{min-height:70px; resize:vertical}
+textarea:focus, input:focus{outline:3px solid var(--accent); outline-offset:1px}
+.big{font-family:var(--font-display); font-weight:800; font-size:26px; border:0; border-radius:99px; padding:18px 34px; background:var(--accent); color:var(--on-accent); cursor:pointer; box-shadow:0 6px 0 var(--accent-deep); transition:transform .1s, box-shadow .1s; display:inline-flex; align-items:center; gap:10px}
+.big:active{transform:translateY(4px); box-shadow:0 2px 0 var(--accent-deep)}
+.big:disabled{background:var(--lilac); color:var(--ink-soft); box-shadow:none; cursor:not-allowed}
+.big:focus-visible{outline:3px solid var(--ink); outline-offset:3px}
+.small-btn{font:inherit; font-weight:800; font-size:16px; border:2px solid var(--accent-soft); background:var(--card); color:var(--accent-deep); border-radius:99px; padding:8px 18px; cursor:pointer}
+.small-btn:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.status{font-weight:800; min-height:1.4em}
+.status.ok{color:var(--good)}
+.status.err{color:#C2346E}
+.yay{display:flex; flex-direction:column; align-items:center; gap:10px}
+.yay .pals{display:flex; gap:6px; align-items:flex-end}
+
+/* Grown-ups */
+details.grown{background:var(--card); border:2px dashed var(--line); border-radius:20px; padding:12px 16px; font-size:16px}
+details.grown summary{cursor:pointer; font-weight:800; color:var(--ink-soft)}
+.grown-body{display:flex; flex-direction:column; gap:14px; padding-top:12px}
+.row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.row input{flex:1; min-width:200px; margin-top:0}
+.history{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px}
+.history li{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; background:var(--lilac); border-radius:12px; padding:8px 12px; font-weight:700}
+.history .meta{color:var(--ink-soft); font-variant-numeric:tabular-nums}
+.history .n{width:100%; font-weight:600; color:var(--ink-soft)}
+.muted{color:var(--ink-soft); font-weight:600; margin:0}
+
+/* Pop + confetti */
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.25) rotate(-8deg)}100%{transform:scale(1)}}
+.pop{animation:pop .45s ease}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+.wiggle{animation:wiggle 1.6s ease-in-out infinite; transform-origin:50% 90%}
+#confetti{position:fixed; inset:0; pointer-events:none; z-index:20}
+@media (prefers-reduced-motion: reduce){*{animation:none!important; transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- Art: small hand-drawn friends, reused everywhere -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="smiley" viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r="18" fill="var(--sun)"/>
+      <circle cx="14" cy="16" r="2.6" fill="var(--face)"/><circle cx="26" cy="16" r="2.6" fill="var(--face)"/>
+      <path d="M12 23 Q20 31 28 23" stroke="var(--face)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="10" cy="22" r="2.5" fill="var(--blush)" opacity=".7"/><circle cx="30" cy="22" r="2.5" fill="var(--blush)" opacity=".7"/>
+    </symbol>
+    <symbol id="flower" viewBox="0 0 60 60">
+      <g fill="var(--petal)">
+        <circle cx="30" cy="12" r="11"/><circle cx="47" cy="24" r="11"/><circle cx="41" cy="44" r="11"/>
+        <circle cx="19" cy="44" r="11"/><circle cx="13" cy="24" r="11"/>
+      </g>
+      <circle cx="30" cy="30" r="12" fill="var(--sun)"/>
+      <circle cx="26" cy="28" r="1.8" fill="var(--face)"/><circle cx="34" cy="28" r="1.8" fill="var(--face)"/>
+      <path d="M25.5 32.5 Q30 37 34.5 32.5" stroke="var(--face)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="puppy" viewBox="0 0 70 64">
+      <ellipse cx="13" cy="26" rx="10" ry="17" fill="var(--pup-ear)" transform="rotate(18 13 26)"/>
+      <ellipse cx="57" cy="26" rx="10" ry="17" fill="var(--pup-ear)" transform="rotate(-18 57 26)"/>
+      <circle cx="35" cy="34" r="24" fill="var(--pup)"/>
+      <ellipse cx="35" cy="44" rx="13" ry="10" fill="var(--white)" opacity=".75"/>
+      <circle cx="26" cy="30" r="3.4" fill="var(--face)"/><circle cx="44" cy="30" r="3.4" fill="var(--face)"/>
+      <circle cx="27" cy="29" r="1.1" fill="var(--white)"/><circle cx="45" cy="29" r="1.1" fill="var(--white)"/>
+      <ellipse cx="35" cy="39" rx="5" ry="3.6" fill="var(--face)"/>
+      <path d="M31 44 Q35 47 39 44" stroke="var(--face)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M33 45.5 Q35 53 37 45.5 Z" fill="var(--blush)"/>
+    </symbol>
+    <symbol id="cat" viewBox="0 0 70 64">
+      <path d="M10 30 L14 4 L30 16 Z" fill="var(--cat)"/><path d="M60 30 L56 4 L40 16 Z" fill="var(--cat)"/>
+      <path d="M15 22 L16 10 L25 17 Z" fill="var(--blush)" opacity=".8"/><path d="M55 22 L54 10 L45 17 Z" fill="var(--blush)" opacity=".8"/>
+      <ellipse cx="35" cy="36" rx="27" ry="23" fill="var(--cat)"/>
+      <path d="M24 32 Q27 28 30 32" stroke="var(--face)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <path d="M40 32 Q43 28 46 32" stroke="var(--face)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <path d="M33 39 L37 39 L35 41.5 Z" fill="var(--blush)"/>
+      <path d="M31 44 Q33 46 35 44 Q37 46 39 44" stroke="var(--face)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <g stroke="var(--cat-dark)" stroke-width="1.6" stroke-linecap="round"><path d="M8 38 L22 40"/><path d="M8 44 L22 43"/><path d="M62 38 L48 40"/><path d="M62 44 L48 43"/></g>
+      <circle cx="22" cy="40" r="3" fill="var(--blush)" opacity=".55"/><circle cx="48" cy="40" r="3" fill="var(--blush)" opacity=".55"/>
+    </symbol>
+    <symbol id="squishy" viewBox="0 0 64 56">
+      <path d="M8 34 C6 16 20 6 32 6 C46 6 58 16 56 34 C55 48 44 52 32 52 C20 52 9 48 8 34 Z" fill="var(--squish)"/>
+      <path d="M22 10 Q26 4 30 9" stroke="var(--mint)" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <circle cx="24" cy="30" r="3" fill="var(--face)"/><circle cx="40" cy="30" r="3" fill="var(--face)"/>
+      <path d="M29 35 Q32 38 35 35" stroke="var(--face)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="18" cy="37" rx="4" ry="2.6" fill="var(--blush)" opacity=".7"/><ellipse cx="46" cy="37" rx="4" ry="2.6" fill="var(--blush)" opacity=".7"/>
+      <ellipse cx="20" cy="18" rx="5" ry="3" fill="var(--white)" opacity=".6" transform="rotate(-25 20 18)"/>
+    </symbol>
+    <symbol id="sparkle" viewBox="0 0 30 30">
+      <path d="M15 1 Q17 13 29 15 Q17 17 15 29 Q13 17 1 15 Q13 13 15 1 Z" fill="var(--sun)"/>
+    </symbol>
+    <symbol id="heart" viewBox="0 0 30 28">
+      <path d="M15 26 C4 18 1 12 3 7 C5 2 12 1 15 7 C18 1 25 2 27 7 C29 12 26 18 15 26 Z" fill="var(--petal)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<main class="wrap">
+  <header class="hero">
+    <svg class="ic deco" width="26" height="26" style="top:10px;right:120px" aria-hidden="true"><use href="#sparkle"/></svg>
+    <svg class="ic deco" width="18" height="18" style="bottom:12px;left:48%" aria-hidden="true"><use href="#heart"/></svg>
+    <div class="text">
+      <h1>Sofie's Room Reset</h1>
+      <p>Tap each one as you go. Your pets are rooting for you!</p>
+    </div>
+    <div class="pals" aria-hidden="true">
+      <svg class="ic wiggle" width="78" height="72"><use href="#puppy"/></svg>
+      <svg class="ic" width="70" height="64"><use href="#cat"/></svg>
+      <svg class="ic wiggle" width="50" height="50" style="animation-delay:.5s"><use href="#flower"/></svg>
+    </div>
+  </header>
+
+  <div class="progress" role="status" aria-live="polite">
+    <div class="bar">
+      <div class="bar-top"><span id="cheer">Let's do this!</span><span class="count" id="count">0 of 33</span></div>
+      <div class="track"><div class="fill" id="fill"></div></div>
+    </div>
+    <div class="stickers" id="stickers"></div>
+  </div>
+
+  <div id="zones" style="display:flex;flex-direction:column;gap:20px"></div>
+
+  <section class="finish" id="finish">
+    <div id="finishReady">
+      <svg class="ic" width="64" height="64" style="margin:0 auto 6px" aria-hidden="true"><use href="#smiley"/></svg>
+      <h2 id="finishTitle">Almost there!</h2>
+      <p id="finishSub">Check off everything and this button lights up.</p>
+    </div>
+    <div class="note-wrap" id="noteWrap">
+      <label for="note">Want to leave Mom a note? (optional)</label>
+      <textarea id="note" placeholder="I found my missing squishy under the bed!"></textarea>
+    </div>
+    <button class="big" id="doneBtn" disabled>
+      <svg class="ic" width="32" height="32" aria-hidden="true"><use href="#heart"/></svg>
+      Tell Mom I'm done!
+    </button>
+    <div class="status" id="status" aria-live="polite"></div>
+    <div class="yay" id="yay" hidden>
+      <div class="pals" aria-hidden="true">
+        <svg class="ic wiggle" width="70" height="64"><use href="#cat"/></svg>
+        <svg class="ic wiggle" width="64" height="56" style="animation-delay:.3s"><use href="#squishy"/></svg>
+        <svg class="ic wiggle" width="78" height="72" style="animation-delay:.6s"><use href="#puppy"/></svg>
+      </div>
+      <button class="small-btn" id="againBtn">Start a fresh checklist</button>
+    </div>
+  </section>
+
+  <details class="grown" id="grown">
+    <summary>For grown-ups</summary>
+    <div class="grown-body">
+      <div>
+        <label for="momPhone" style="font-weight:800">Mom's phone number or iMessage email</label>
+        <div class="row" style="margin-top:4px">
+          <input type="text" id="momPhone" placeholder="(281) 555-0123" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <button class="small-btn" id="savePhone">Save</button>
+          <button class="small-btn" id="testText">Try it</button>
+        </div>
+        <p class="muted" id="phoneStatus" style="margin-top:6px">Saved only on this iPad. When Sofie taps "Tell Mom I'm done!", Messages opens with a text to you ready to send.</p>
+      </div>
+    </div>
+  </details>
+</main>
+
+<script>
+const ZONES = [
+  { id:'floor', title:'Floor Patrol', art:'puppy', w:58, h:53, tip:'Start low! A clear floor makes everything easier.', items:[
+    ['f1','Dirty clothes go in the hamper','Hamper full? Bring it downstairs and start a load in the washer.'],
+    ['f2','Squishies, stuffies and toys back where they live'],
+    ['f3','Trash and wrappers in the trash can'],
+    ['f3b','Take your trash out to the big can in the garage'],
+    ['f4','Shoes paired up in the closet'],
+    ['f6','Vacuum your rug'],
+  ]},
+  { id:'bed', title:'Cozy Bed & Nightstand', art:'cat', w:58, h:53, tip:'Make it look like a hotel bed for a cat.', items:[
+    ['b1','Fitted sheet is on snug','Check all four corners. None popped off!'],
+    ['b1b','Comforter pulled up smooth'],
+    ['b2','Fluff the pillows and line them up'],
+    ['b3','Stuffies sit nicely on the bed'],
+    ['b4','Nothing hiding under the bed', 'Only things that belong there!'],
+    ['n1','Nightstand: trash and cups cleared off','Trash in the can, cups to the kitchen.'],
+    ['n2','Nightstand: clothes and books back where they go','Clothes in the hamper or put away, books back in their spot.'],
+    ['n3','Nightstand is neat and organized','Only things that belong there.'],
+    ['n4','Wipe the top of the nightstand'],
+  ]},
+  { id:'desk', title:'Happy Desk', art:'smiley', w:48, h:48, tip:'Clear space, clear brain.', items:[
+    ['d1','School papers in your folder or backpack'],
+    ['d2','Markers and pencils back in their cups'],
+    ['d3','Books back on the shelf'],
+    ['d5','Craft supplies and projects put away where they belong'],
+    ['d6','No trash on the desk','Scraps and wrappers go in the trash can.'],
+    ['d7','Cubbies under the desk are neat','No trash, nothing that does not belong, nothing sticking out or overflowing.'],
+    ['d8','Drawer tower: top is clear','Nothing out of place on top.'],
+    ['d9','Drawer tower: every drawer closed all the way'],
+    ['d10','Wipe the top of the drawer tower'],
+    ['d4','Wipe the desk top'],
+  ]},
+  { id:'closet', title:'Closet & Dresser', art:'flower', w:52, h:52, tip:'Everything gets a home.', items:[
+    ['c1','Clean clothes folded or hung up'],
+    ['c2','Drawers closed all the way'],
+    ['c3','Closet floor is clear'],
+    ['c4','Top of the dresser is clear','Jewelry goes where it lives, trash goes in the can.'],
+    ['c5','Wipe the top of the dresser'],
+  ]},
+  { id:'sparkle', title:'Sparkle Finish', art:'squishy', w:56, h:49, tip:'The last little touches make it shine.', items:[
+    ['s1','Cups, plates and snack stuff go to the kitchen'],
+    ['s3','Close the blinds and curtains, and turn off extra lights'],
+    ['s4','Stand at the door and look. Does it look awesome?'],
+  ]},
+];
+const ALL = ZONES.flatMap(z => z.items.map(i => i[0]));
+const TOTAL = ALL.length;
+const CHEERS = ["Let's do this!","Great start!","You're on a roll!","Look at you go!","Halfway! Keep going!","So close!","Last few!","All done! You rock!"];
+const KEY = 'sofie-room-v1';
+const today = () => new Date().toLocaleDateString('en-CA');
+
+let checked = new Set();
+try {
+  const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+  if (s && s.day === today()) checked = new Set(s.checked || []);
+} catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify({day:today(), checked:[...checked]})); } catch(e){} }
+
+const svgUse = (id,w,h,cls='') => `<svg class="ic ${cls}" width="${w}" height="${h}" aria-hidden="true"><use href="#${id}"/></svg>`;
+
+// Build zones
+const zonesEl = document.getElementById('zones');
+const stickersEl = document.getElementById('stickers');
+ZONES.forEach(z => {
+  const sec = document.createElement('section');
+  sec.className = 'zone'; sec.id = 'zone-' + z.id;
+  sec.innerHTML = `<div class="zone-head">${svgUse(z.art,z.w,z.h)}<div class="htext"><h2>${z.title}</h2><p class="tip">${z.tip}</p></div><span class="zone-badge" id="badge-${z.id}">0/${z.items.length}</span></div>
+  <ul class="tasks">${z.items.map(([id,t,sub]) => `<li><button class="task" role="checkbox" aria-checked="false" id="t-${id}" data-id="${id}"><span class="box">${svgUse('smiley',36,36)}</span><span class="label">${t}${sub?`<small>${sub}</small>`:''}</span></button></li>`).join('')}</ul>`;
+  zonesEl.appendChild(sec);
+  const st = document.createElement('div');
+  st.className = 'sticker'; st.id = 'st-' + z.id; st.title = z.title;
+  st.innerHTML = svgUse(z.art, 30, 28);
+  stickersEl.appendChild(st);
+});
+
+zonesEl.addEventListener('click', e => {
+  const b = e.target.closest('.task'); if (!b) return;
+  const id = b.dataset.id;
+  if (checked.has(id)) checked.delete(id); else { checked.add(id); popAt(b.querySelector('.box')); }
+  save(); render(true);
+});
+
+let wasAll = false;
+function render(fromTap){
+  ALL.forEach(id => document.getElementById('t-'+id).setAttribute('aria-checked', checked.has(id)));
+  ZONES.forEach(z => {
+    const n = z.items.filter(i => checked.has(i[0])).length, full = n === z.items.length;
+    document.getElementById('badge-'+z.id).textContent = full ? 'Done!' : `${n}/${z.items.length}`;
+    const sec = document.getElementById('zone-'+z.id), st = document.getElementById('st-'+z.id);
+    if (full && !sec.classList.contains('complete') && fromTap) { st.classList.remove('pop'); void st.offsetWidth; st.classList.add('pop'); burst(40); }
+    sec.classList.toggle('complete', full); st.classList.toggle('got', full);
+  });
+  const n = checked.size;
+  document.getElementById('fill').style.width = (n/TOTAL*100) + '%';
+  document.getElementById('count').textContent = `${n} of ${TOTAL}`;
+  document.getElementById('cheer').textContent = CHEERS[Math.min(CHEERS.length-1, n===TOTAL ? 7 : Math.floor(n/TOTAL*7))];
+  const all = n === TOTAL;
+  const btn = document.getElementById('doneBtn');
+  if (!sent) btn.disabled = !all;
+  document.getElementById('finishTitle').textContent = all ? 'You did it!' : 'Almost there!';
+  document.getElementById('finishSub').textContent = all ? 'Your room looks amazing. Tap the big button to tell Mom.' : `${TOTAL-n} more to go, then this button lights up.`;
+  if (all && !wasAll && fromTap) burst(140);
+  wasAll = all;
+}
+
+// Confetti: hearts, petals and stars
+const cv = document.getElementById('confetti'), cx = cv.getContext('2d');
+let parts = [], raf = 0;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const COLORS = () => { const s = getComputedStyle(document.documentElement); return ['--accent','--petal','--sun','--mint','--accent-soft','--blush'].map(v => s.getPropertyValue(v).trim()); };
+function resize(){ cv.width = innerWidth*devicePixelRatio; cv.height = innerHeight*devicePixelRatio; }
+addEventListener('resize', resize); resize();
+function burst(count, x, y){
+  if (reduce) return;
+  const cols = COLORS();
+  x = x ?? innerWidth/2; y = y ?? innerHeight/3;
+  for (let i=0;i<count;i++){
+    const a = Math.random()*Math.PI*2, sp = 3 + Math.random()*7;
+    parts.push({x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - 4, r:4+Math.random()*6, c:cols[i%cols.length], s:Math.floor(Math.random()*3), rot:Math.random()*6, life:90+Math.random()*40});
+  }
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function popAt(el){ const r = el.getBoundingClientRect(); burst(14, r.left+r.width/2, r.top+r.height/2); }
+function tick(){
+  const d = devicePixelRatio; cx.clearRect(0,0,cv.width,cv.height);
+  parts = parts.filter(p => p.life-- > 0);
+  parts.forEach(p => {
+    p.vy += .22; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.rot += .1;
+    cx.save(); cx.translate(p.x*d, p.y*d); cx.rotate(p.rot); cx.fillStyle = p.c; cx.globalAlpha = Math.min(1, p.life/30);
+    const r = p.r*d; cx.beginPath();
+    if (p.s===0){ cx.arc(0,0,r*.7,0,7); }
+    else if (p.s===1){ cx.moveTo(0,r*.9); cx.bezierCurveTo(-r*1.4,0,-r*.5,-r*1,0,-r*.3); cx.bezierCurveTo(r*.5,-r*1,r*1.4,0,0,r*.9); }
+    else { for(let i=0;i<8;i++){ const rr = i%2? r*.4 : r; const a = i*Math.PI/4; cx.lineTo(Math.cos(a)*rr, Math.sin(a)*rr); } }
+    cx.fill(); cx.restore();
+  });
+  raf = parts.length ? requestAnimationFrame(tick) : 0;
+  if (!raf) cx.clearRect(0,0,cv.width,cv.height);
+}
+
+// Texting Mom (iMessage). The number lives only on this iPad.
+let sent = false;
+const PHONE_KEY = 'mom-phone-v1';
+const statusEl = document.getElementById('status');
+function setStatus(t, cls=''){ statusEl.textContent = t; statusEl.className = 'status ' + cls; }
+function getPhone(){ try { return localStorage.getItem(PHONE_KEY) || ''; } catch(e){ return ''; } }
+function cleanAddr(v){
+  v = v.trim();
+  if (v.includes('@')) return v;
+  const plus = v.startsWith('+');
+  const digits = v.replace(/\D/g, '');
+  if (!digits) return '';
+  if (plus) return '+' + digits;
+  if (digits.length === 10) return '+1' + digits;
+  if (digits.length === 11 && digits[0] === '1') return '+' + digits;
+  return digits;
+}
+function openText(body){
+  const to = getPhone();
+  if (!to) return false;
+  location.href = 'sms:' + to + '&body=' + encodeURIComponent(body);
+  return true;
+}
+
+document.getElementById('doneBtn').addEventListener('click', () => {
+  const btn = document.getElementById('doneBtn');
+  if (checked.size !== TOTAL || sent) return;
+  const note = document.getElementById('note').value.trim();
+  const msg = "Mom, I finished cleaning my room! I checked off all " + TOTAL + " things. Come look!" + (note ? "\n\n" + note : "");
+  if (!openText(msg)) { setStatus('Ask Mom to set up the text button (at the bottom of this page). Then go show her your room!', 'err'); return; }
+  sent = true;
+  btn.hidden = true;
+  document.getElementById('noteWrap').hidden = true;
+  document.getElementById('yay').hidden = false;
+  burst(160);
+  setStatus('Messages is open. Tap the blue send arrow to tell Mom!', 'ok');
+});
+
+document.getElementById('againBtn').addEventListener('click', () => {
+  checked = new Set(); save(); sent = false; wasAll = false;
+  document.getElementById('note').value = '';
+  document.getElementById('noteWrap').hidden = false;
+  document.getElementById('doneBtn').hidden = false;
+  document.getElementById('yay').hidden = true;
+  setStatus(''); render(false); scrollTo({top:0, behavior: reduce ? 'auto' : 'smooth'});
+});
+
+// Grown-up setup
+const phoneInput = document.getElementById('momPhone'), phoneStatus = document.getElementById('phoneStatus');
+function phoneMsg(t, err){ phoneStatus.textContent = t; phoneStatus.style.color = err ? '#C2346E' : ''; }
+phoneInput.value = getPhone();
+document.getElementById('savePhone').addEventListener('click', () => {
+  const v = cleanAddr(phoneInput.value);
+  if (phoneInput.value.trim() && (!v || (!v.includes('@') && v.replace(/\D/g,'').length < 10))) { phoneMsg('That number looks too short. Include the area code.', true); return; }
+  try { if (v) localStorage.setItem(PHONE_KEY, v); else localStorage.removeItem(PHONE_KEY); }
+  catch(e){ phoneMsg('This browser would not save it. Open the page in Safari or from the home screen icon and try again.', true); return; }
+  phoneInput.value = v;
+  phoneMsg(v ? 'Saved on this iPad. Tap "Try it" to make sure Messages opens.' : 'Cleared.');
+});
+document.getElementById('testText').addEventListener('click', () => {
+  if (!openText('Test from the room checklist. When Sofie finishes, you will get a text like this.')) phoneMsg('Save a number first.', true);
+  else phoneMsg('Messages should be open with a test text. Send it to check it arrives.');
+});
+
+render(false);
+</script>
+</body>
+</html>
