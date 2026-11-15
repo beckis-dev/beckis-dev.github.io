@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Bathroom Reset">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F3ECFF">
+<link rel="apple-touch-icon" href="../assets/bath-icon-180.png">
+<link rel="icon" type="image/png" href="../assets/bath-icon-512.png">
+<title>Bathroom Reset</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Grandstander:wght@600;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: one friendly column sized for an iPad; each bathroom zone is a card with its own mascot; a sticky progress strip; big finish button at the end. */
+:root{
+  --bg:#F3ECFF; --bg-dot:#E4D5FF; --card:#FFFFFF; --ink:#2E1452; --ink-soft:#6A4E95; --line:#DCCBFA;
+  --accent:#7C3AED; --accent-deep:#5B21B6; --accent-soft:#C9B0FF; --lilac:#EEE4FF; --done-bg:#F6F0FF;
+  --on-accent:#FFFFFF; --good:#2F9E6B;
+  --petal:#F59AC9; --sun:#FFD65C; --pup:#E9BC8C; --pup-ear:#B07A4F; --cat:#C3AEEA; --cat-dark:#9277C9;
+  --squish:#FFC2D6; --mint:#A6E8CE; --face:#3A1F5C; --blush:#FF8FB3; --white:#FFFFFF;
+  --font-display:"Grandstander","Comic Sans MS","Chalkboard SE",system-ui,sans-serif;
+  --font-body:"Nunito",ui-rounded,"SF Pro Rounded",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#170D2A; --bg-dot:#24163F; --card:#251741; --ink:#F3EAFF; --ink-soft:#BCA7E2; --line:#3E2B66;
+  --accent:#B48CFF; --accent-deep:#D6BEFF; --accent-soft:#5A3A99; --lilac:#2F1F52; --done-bg:#2C1C4C;
+  --on-accent:#1B0D33; --good:#6FD6A6; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#170D2A; --bg-dot:#24163F; --card:#251741; --ink:#F3EAFF; --ink-soft:#BCA7E2; --line:#3E2B66;
+  --accent:#B48CFF; --accent-deep:#D6BEFF; --accent-soft:#5A3A99; --lilac:#2F1F52; --done-bg:#2C1C4C;
+  --on-accent:#1B0D33; --good:#6FD6A6; color-scheme:dark;
+}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;
+  background:var(--bg); color:var(--ink); font-family:var(--font-body); font-size:18px; line-height:1.45;
+  background-image:radial-gradient(var(--bg-dot) 2.5px, transparent 3px), radial-gradient(var(--bg-dot) 2.5px, transparent 3px);
+  background-size:44px 44px; background-position:0 0, 22px 22px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px));
+  padding-block:20px 48px;
+}
+.wrap{max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:20px}
+svg.ic{display:block; flex:none}
+
+/* Header */
+.hero{position:relative; background:var(--card); border:3px solid var(--line); border-radius:28px; padding:22px 22px 18px; display:flex; align-items:center; gap:16px; overflow:hidden}
+.hero h1{font-family:var(--font-display); font-weight:800; font-size:clamp(30px,6vw,44px); line-height:1.05; margin:0; color:var(--accent-deep); text-wrap:balance}
+.hero p{margin:6px 0 0; color:var(--ink-soft); font-weight:700}
+.hero .text{flex:1; min-width:0}
+.hero .pals{display:flex; align-items:flex-end; gap:4px}
+.hero .deco{position:absolute; opacity:.9}
+@media (max-width:520px){.hero{flex-direction:column; align-items:flex-start}.hero .pals{align-self:flex-end; margin-top:-10px}}
+
+/* Progress */
+.progress{position:sticky; top:env(safe-area-inset-top, 0px); z-index:5; background:var(--card); border:3px solid var(--line); border-radius:22px; padding:12px 16px; display:flex; align-items:center; gap:14px; box-shadow:0 6px 18px -10px rgba(60,20,120,.35)}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top, 0px); z-index:10; background:var(--bg)}
+.bar{flex:1; min-width:0}
+.bar-top{display:flex; justify-content:space-between; align-items:baseline; gap:8px; font-weight:800}
+.bar-top .count{font-variant-numeric:tabular-nums; color:var(--accent-deep)}
+.track{height:18px; border-radius:99px; background:var(--lilac); margin-top:6px; overflow:hidden; border:2px solid var(--line)}
+.fill{height:100%; width:0; border-radius:99px; background:repeating-linear-gradient(-45deg, var(--accent) 0 12px, var(--accent-deep) 12px 24px); transition:width .4s cubic-bezier(.3,1.4,.5,1)}
+.stickers{display:flex; gap:4px}
+.sticker{width:38px; height:38px; border-radius:50%; background:var(--lilac); display:grid; place-items:center; filter:grayscale(1); opacity:.45; transition:all .3s}
+.sticker.got{filter:none; opacity:1; background:var(--done-bg); transform:scale(1.08)}
+@media (max-width:560px){.stickers{display:none}}
+
+/* Zones */
+.zone{background:var(--card); border:3px solid var(--line); border-radius:28px; padding:18px 18px 10px}
+.zone.complete{border-color:var(--accent-soft); background:var(--done-bg)}
+.zone-head{display:flex; align-items:center; gap:12px; margin-bottom:6px}
+.zone-head h2{font-family:var(--font-display); font-weight:800; font-size:26px; margin:0; color:var(--accent-deep); line-height:1.1}
+.zone-head .tip{margin:2px 0 0; color:var(--ink-soft); font-size:16px; font-weight:700}
+.zone-head .htext{flex:1; min-width:0}
+.zone-badge{font-weight:800; font-size:15px; padding:4px 12px; border-radius:99px; background:var(--lilac); color:var(--accent-deep); white-space:nowrap; font-variant-numeric:tabular-nums}
+.zone.complete .zone-badge{background:var(--accent); color:var(--on-accent)}
+ul.tasks{list-style:none; margin:0; padding:0}
+.timer{display:flex; align-items:center; flex-wrap:wrap; gap:6px 12px; background:var(--lilac); border-radius:18px; padding:10px 12px; margin:8px 0 6px}
+.tbtn{display:inline-flex; align-items:center; gap:6px; font:inherit; font-weight:800; font-size:16px; border:0; border-radius:99px; padding:8px 16px; background:var(--accent); color:var(--on-accent); cursor:pointer; min-height:44px}
+.tbtn:focus-visible{outline:3px solid var(--ink); outline-offset:2px}
+.tbtn.running{background:var(--card); color:var(--accent-deep); box-shadow:inset 0 0 0 2px var(--accent-soft)}
+.tleft{font-family:var(--font-display); font-weight:800; font-size:28px; color:var(--accent-deep); font-variant-numeric:tabular-nums; min-width:4ch}
+.tmsg{flex:1; min-width:140px; font-weight:800; font-size:15px; color:var(--ink-soft)}
+.ttrack{flex-basis:100%; height:8px; border-radius:99px; background:var(--card); overflow:hidden}
+.tfill{height:100%; width:100%; background:var(--petal); border-radius:99px; transition:width 1s linear}
+.timer.urgent .tleft{color:#C2346E}
+.timer.urgent .tfill{background:#E25A8F}
+.timer.up{background:var(--done-bg); box-shadow:inset 0 0 0 2px #E25A8F}
+.timer.up .tleft{color:#C2346E}
+.timer.beat{background:var(--done-bg); box-shadow:inset 0 0 0 2px var(--accent-soft)}
+.timer.beat .tmsg, .timer.beat .tleft{color:var(--good)}
+.mins-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:8px}
+.mins-grid label{display:flex; align-items:center; justify-content:space-between; gap:8px; background:var(--lilac); border-radius:12px; padding:6px 10px; font-weight:700}
+.mins-grid input{width:64px; font:inherit; font-weight:800; text-align:center; color:var(--ink); background:var(--card); border:2px solid var(--line); border-radius:10px; padding:6px}
+.task{display:flex; align-items:center; gap:14px; width:100%; text-align:left; background:none; border:0; border-top:2px dashed var(--line); padding:14px 4px; font:inherit; color:inherit; font-weight:700; cursor:pointer; -webkit-tap-highlight-color:transparent; min-height:64px}
+li:first-child .task{border-top:0}
+.task:focus-visible{outline:3px solid var(--accent); outline-offset:2px; border-radius:14px}
+.box{width:44px; height:44px; flex:none; border-radius:50%; border:3px solid var(--accent-soft); background:var(--card); display:grid; place-items:center; transition:transform .2s, background .2s, border-color .2s}
+.box svg{opacity:0; transform:scale(.3); transition:all .25s cubic-bezier(.3,1.6,.5,1)}
+.task[aria-checked="true"] .box{background:var(--sun); border-color:var(--sun)}
+.task[aria-checked="true"] .box svg{opacity:1; transform:scale(1)}
+.task[aria-checked="true"] .label{text-decoration:line-through; text-decoration-color:var(--accent-soft); text-decoration-thickness:3px; color:var(--ink-soft)}
+.task:active .box{transform:scale(.9)}
+.label{flex:1; min-width:0}
+.label small{display:block; font-weight:600; color:var(--ink-soft); font-size:15px}
+
+/* Finish */
+.finish{background:var(--card); border:3px solid var(--line); border-radius:28px; padding:22px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:12px}
+.finish h2{font-family:var(--font-display); font-weight:800; font-size:30px; margin:0; color:var(--accent-deep); text-wrap:balance}
+.finish p{margin:0; color:var(--ink-soft); font-weight:700}
+.note-wrap{width:100%; max-width:480px; text-align:left}
+.note-wrap label{font-weight:800; font-size:16px; color:var(--ink-soft)}
+textarea, input[type=email]{width:100%; font:inherit; font-size:17px; color:var(--ink); background:var(--lilac); border:2px solid var(--line); border-radius:16px; padding:12px 14px; margin-top:4px}
+textarea{min-height:70px; resize:vertical}
+textarea:focus, input:focus{outline:3px solid var(--accent); outline-offset:1px}
+.big{font-family:var(--font-display); font-weight:800; font-size:26px; border:0; border-radius:99px; padding:18px 34px; background:var(--accent); color:var(--on-accent); cursor:pointer; box-shadow:0 6px 0 var(--accent-deep); transition:transform .1s, box-shadow .1s; display:inline-flex; align-items:center; gap:10px}
+.big:active{transform:translateY(4px); box-shadow:0 2px 0 var(--accent-deep)}
+.big:disabled{background:var(--lilac); color:var(--ink-soft); box-shadow:none; cursor:not-allowed}
+.big:focus-visible{outline:3px solid var(--ink); outline-offset:3px}
+.small-btn{font:inherit; font-weight:800; font-size:16px; border:2px solid var(--accent-soft); background:var(--card); color:var(--accent-deep); border-radius:99px; padding:8px 18px; cursor:pointer}
+.small-btn:focus-visible{outline:3px solid var(--accent); outline-offset:2px}
+.status{font-weight:800; min-height:1.4em}
+.status.ok{color:var(--good)}
+.status.err{color:#C2346E}
+.yay{display:flex; flex-direction:column; align-items:center; gap:10px}
+.yay .pals{display:flex; gap:6px; align-items:flex-end}
+
+/* Grown-ups */
+details.grown{background:var(--card); border:2px dashed var(--line); border-radius:20px; padding:12px 16px; font-size:16px}
+details.grown summary{cursor:pointer; font-weight:800; color:var(--ink-soft)}
+.grown-body{display:flex; flex-direction:column; gap:14px; padding-top:12px}
+.row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.row input{flex:1; min-width:200px; margin-top:0}
+.history{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:6px}
+.history li{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; background:var(--lilac); border-radius:12px; padding:8px 12px; font-weight:700}
+.history .meta{color:var(--ink-soft); font-variant-numeric:tabular-nums}
+.history .n{width:100%; font-weight:600; color:var(--ink-soft)}
+.muted{color:var(--ink-soft); font-weight:600; margin:0}
+
+/* Pop + confetti */
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.25) rotate(-8deg)}100%{transform:scale(1)}}
+.pop{animation:pop .45s ease}
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+.wiggle{animation:wiggle 1.6s ease-in-out infinite; transform-origin:50% 90%}
+#confetti{position:fixed; inset:0; pointer-events:none; z-index:20}
+@media (prefers-reduced-motion: reduce){*{animation:none!important; transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- Art: small hand-drawn friends, reused everywhere -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="smiley" viewBox="0 0 40 40">
+      <circle cx="20" cy="20" r="18" fill="var(--sun)"/>
+      <circle cx="14" cy="16" r="2.6" fill="var(--face)"/><circle cx="26" cy="16" r="2.6" fill="var(--face)"/>
+      <path d="M12 23 Q20 31 28 23" stroke="var(--face)" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="10" cy="22" r="2.5" fill="var(--blush)" opacity=".7"/><circle cx="30" cy="22" r="2.5" fill="var(--blush)" opacity=".7"/>
+    </symbol>
+    <symbol id="flower" viewBox="0 0 60 60">
+      <g fill="var(--petal)">
+        <circle cx="30" cy="12" r="11"/><circle cx="47" cy="24" r="11"/><circle cx="41" cy="44" r="11"/>
+        <circle cx="19" cy="44" r="11"/><circle cx="13" cy="24" r="11"/>
+      </g>
+      <circle cx="30" cy="30" r="12" fill="var(--sun)"/>
+      <circle cx="26" cy="28" r="1.8" fill="var(--face)"/><circle cx="34" cy="28" r="1.8" fill="var(--face)"/>
+      <path d="M25.5 32.5 Q30 37 34.5 32.5" stroke="var(--face)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="puppy" viewBox="0 0 70 64">
+      <ellipse cx="13" cy="26" rx="10" ry="17" fill="var(--pup-ear)" transform="rotate(18 13 26)"/>
+      <ellipse cx="57" cy="26" rx="10" ry="17" fill="var(--pup-ear)" transform="rotate(-18 57 26)"/>
+      <circle cx="35" cy="34" r="24" fill="var(--pup)"/>
+      <ellipse cx="35" cy="44" rx="13" ry="10" fill="var(--white)" opacity=".75"/>
+      <circle cx="26" cy="30" r="3.4" fill="var(--face)"/><circle cx="44" cy="30" r="3.4" fill="var(--face)"/>
+      <circle cx="27" cy="29" r="1.1" fill="var(--white)"/><circle cx="45" cy="29" r="1.1" fill="var(--white)"/>
+      <ellipse cx="35" cy="39" rx="5" ry="3.6" fill="var(--face)"/>
+      <path d="M31 44 Q35 47 39 44" stroke="var(--face)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M33 45.5 Q35 53 37 45.5 Z" fill="var(--blush)"/>
+    </symbol>
+    <symbol id="cat" viewBox="0 0 70 64">
+      <path d="M10 30 L14 4 L30 16 Z" fill="var(--cat)"/><path d="M60 30 L56 4 L40 16 Z" fill="var(--cat)"/>
+      <path d="M15 22 L16 10 L25 17 Z" fill="var(--blush)" opacity=".8"/><path d="M55 22 L54 10 L45 17 Z" fill="var(--blush)" opacity=".8"/>
+      <ellipse cx="35" cy="36" rx="27" ry="23" fill="var(--cat)"/>
+      <path d="M24 32 Q27 28 30 32" stroke="var(--face)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <path d="M40 32 Q43 28 46 32" stroke="var(--face)" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+      <path d="M33 39 L37 39 L35 41.5 Z" fill="var(--blush)"/>
+      <path d="M31 44 Q33 46 35 44 Q37 46 39 44" stroke="var(--face)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <g stroke="var(--cat-dark)" stroke-width="1.6" stroke-linecap="round"><path d="M8 38 L22 40"/><path d="M8 44 L22 43"/><path d="M62 38 L48 40"/><path d="M62 44 L48 43"/></g>
+      <circle cx="22" cy="40" r="3" fill="var(--blush)" opacity=".55"/><circle cx="48" cy="40" r="3" fill="var(--blush)" opacity=".55"/>
+    </symbol>
+    <symbol id="squishy" viewBox="0 0 64 56">
+      <path d="M8 34 C6 16 20 6 32 6 C46 6 58 16 56 34 C55 48 44 52 32 52 C20 52 9 48 8 34 Z" fill="var(--squish)"/>
+      <path d="M22 10 Q26 4 30 9" stroke="var(--mint)" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <circle cx="24" cy="30" r="3" fill="var(--face)"/><circle cx="40" cy="30" r="3" fill="var(--face)"/>
+      <path d="M29 35 Q32 38 35 35" stroke="var(--face)" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+      <ellipse cx="18" cy="37" rx="4" ry="2.6" fill="var(--blush)" opacity=".7"/><ellipse cx="46" cy="37" rx="4" ry="2.6" fill="var(--blush)" opacity=".7"/>
+      <ellipse cx="20" cy="18" rx="5" ry="3" fill="var(--white)" opacity=".6" transform="rotate(-25 20 18)"/>
+    </symbol>
+    <symbol id="sparkle" viewBox="0 0 30 30">
+      <path d="M15 1 Q17 13 29 15 Q17 17 15 29 Q13 17 1 15 Q13 13 15 1 Z" fill="var(--sun)"/>
+    </symbol>
+    <symbol id="clock" viewBox="0 0 30 30">
+      <circle cx="15" cy="16" r="12" fill="var(--card)" stroke="currentColor" stroke-width="3"/>
+      <path d="M15 9 V16 L20 19" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M11 2 H19" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+    </symbol>
+    <symbol id="bubble" viewBox="0 0 30 30">
+      <circle cx="15" cy="15" r="13" fill="var(--mint)" opacity=".85"/>
+      <ellipse cx="10" cy="9.5" rx="4" ry="2.4" fill="var(--white)" opacity=".8" transform="rotate(-35 10 9.5)"/>
+    </symbol>
+    <symbol id="heart" viewBox="0 0 30 28">
+      <path d="M15 26 C4 18 1 12 3 7 C5 2 12 1 15 7 C18 1 25 2 27 7 C29 12 26 18 15 26 Z" fill="var(--petal)"/>
+    </symbol>
+  </defs>
+</svg>
+
+<canvas id="confetti" aria-hidden="true"></canvas>
+
+<main class="wrap">
+  <header class="hero">
+    <svg class="ic deco" width="26" height="26" style="top:10px;right:120px" aria-hidden="true"><use href="#sparkle"/></svg>
+    <svg class="ic deco" width="18" height="18" style="bottom:10px;right:150px" aria-hidden="true"><use href="#heart"/></svg>
+    <svg class="ic deco" width="22" height="22" style="top:14px;left:56%" aria-hidden="true"><use href="#bubble"/></svg>
+    <svg class="ic deco" width="14" height="14" style="bottom:20px;right:24px" aria-hidden="true"><use href="#bubble"/></svg>
+    <div class="text">
+      <h1>Sofie's Bathroom Reset</h1>
+      <p>Tap each one as you go. Let's make it sparkle!</p>
+    </div>
+    <div class="pals" aria-hidden="true">
+      <svg class="ic wiggle" width="78" height="72"><use href="#puppy"/></svg>
+      <svg class="ic" width="70" height="64"><use href="#cat"/></svg>
+      <svg class="ic wiggle" width="50" height="50" style="animation-delay:.5s"><use href="#flower"/></svg>
+    </div>
+  </header>
+
+  <div class="progress" role="status" aria-live="polite">
+    <div class="bar">
+      <div class="bar-top"><span id="cheer">Let's do this!</span><span class="count" id="count">0 of 28</span></div>
+      <div class="track"><div class="fill" id="fill"></div></div>
+    </div>
+    <div class="stickers" id="stickers"></div>
+  </div>
+
+  <div id="zones" style="display:flex;flex-direction:column;gap:20px"></div>
+
+  <section class="finish" id="finish">
+    <div id="finishReady">
+      <svg class="ic" width="64" height="64" style="margin:0 auto 6px" aria-hidden="true"><use href="#smiley"/></svg>
+      <h2 id="finishTitle">Almost there!</h2>
+      <p id="finishSub">Check off everything and this button lights up.</p>
+    </div>
+    <div class="note-wrap" id="noteWrap">
+      <label for="note">Want to leave Mom a note? (optional)</label>
+      <textarea id="note" placeholder="The mirror is so shiny I can see my whole face!"></textarea>
+    </div>
+    <button class="big" id="doneBtn" disabled>
+      <svg class="ic" width="32" height="32" aria-hidden="true"><use href="#heart"/></svg>
+      Tell Mom I'm done!
+    </button>
+    <div class="status" id="status" aria-live="polite"></div>
+    <div class="yay" id="yay" hidden>
+      <div class="pals" aria-hidden="true">
+        <svg class="ic wiggle" width="70" height="64"><use href="#cat"/></svg>
+        <svg class="ic wiggle" width="64" height="56" style="animation-delay:.3s"><use href="#squishy"/></svg>
+        <svg class="ic wiggle" width="78" height="72" style="animation-delay:.6s"><use href="#puppy"/></svg>
+      </div>
+      <button class="small-btn" id="againBtn">Start a fresh checklist</button>
+    </div>
+  </section>
+
+  <details class="grown" id="grown">
+    <summary>For grown-ups</summary>
+    <div class="grown-body">
+      <div>
+        <label for="momPhone" style="font-weight:800">Mom's phone number or iMessage email</label>
+        <div class="row" style="margin-top:4px">
+          <input type="text" id="momPhone" placeholder="(281) 555-0123" autocomplete="off" autocapitalize="off" spellcheck="false">
+          <button class="small-btn" id="savePhone">Save</button>
+          <button class="small-btn" id="testText">Try it</button>
+        </div>
+        <p class="muted" id="phoneStatus" style="margin-top:6px">Saved only on this iPad. When Sofie taps "Tell Mom I'm done!", Messages opens with a text to you ready to send.</p>
+      </div>
+      <div>
+        <div style="font-weight:800; margin-bottom:6px">Minutes for each section's timer</div>
+        <div class="mins-grid" id="minsGrid"></div>
+        <p class="muted" id="minsStatus" style="margin-top:6px">Changes save on this iPad right away.</p>
+      </div>
+    </div>
+  </details>
+</main>
+
+<script>
+const ZONES = [
+  { id:'counter', mins:8, title:'Counter & Mirror', art:'flower', w:52, h:52, tip:'Clear it, wipe it, make it shine.', items:[
+    ['c1','Toothbrush and toothpaste put away'],
+    ['c2','Hairbrush, hair ties and clips back where they live'],
+    ['c3','Trash off the counter','Floss, wrappers and empty bottles go in the trash can.'],
+    ['c4','Wipe the counter','Lift things up and wipe under them too.'],
+    ['c5','Wipe the sink and rinse out the toothpaste'],
+    ['c6','Shine the faucet'],
+    ['c7','Spray and wipe the mirror','Wipe until there are no spots or streaks.'],
+  ]},
+  { id:'toilet', mins:5, title:'Toilet', art:'cat', w:58, h:53, tip:'Quick and squeaky clean. Top to bottom!', items:[
+    ['t1','Scrub inside the bowl with the toilet brush','Brush goes back in its holder when you\'re done.'],
+    ['t2','Wipe the top of the tank and the handle'],
+    ['t3','Wipe the lid and the seat, top and bottom'],
+    ['t4','Wipe the outside and around the bottom','Use a new wipe for this part.'],
+    ['t5','Flush and close the lid'],
+  ]},
+  { id:'shower', mins:10, title:'Shower & Bathtub', art:'squishy', w:56, h:49, tip:'Bubbles out, sparkle in.', items:[
+    ['s1','Shampoo, conditioner and body wash lined up','Lids closed!'],
+    ['s2','Take out anything that doesn\'t belong','Toys, cups, hair ties and empty bottles.'],
+    ['s3','Hair out of the drain','Pull it out with a tissue and toss it in the trash.'],
+    ['s4','Rinse down the tub and the walls'],
+    ['s5','Wipe the ring around the tub'],
+    ['s6','Hang up your washcloth or loofah to dry'],
+    ['s7','Close the shower curtain so it can dry'],
+  ]},
+  { id:'hamper', mins:5, title:'Hamper', art:'puppy', w:58, h:53, tip:'Every sock finds its way home.', items:[
+    ['h1','Dirty clothes and pajamas in the hamper','Hamper full? Bring it downstairs and start a load in the washer.'],
+    ['h2','Hang up your towel to dry','Wet towels on the floor get stinky!'],
+    ['h3','Nothing hanging out of the hamper'],
+  ]},
+  { id:'floor', mins:7, title:'Floor & Sparkle Finish', art:'smiley', w:48, h:48, tip:'Floor last, so all the crumbs and hair are gone for good.', items:[
+    ['f1','Pick up everything on the floor'],
+    ['f2','Shake out the bath mat and lay it flat'],
+    ['f3','Wipe up hair and water spots on the floor'],
+    ['f4','Empty your trash can into the big can in the garage'],
+    ['f5','Turn off the light and the fan'],
+    ['f6','Stand at the door and look. Does it sparkle?'],
+  ]},
+];
+const ALL = ZONES.flatMap(z => z.items.map(i => i[0]));
+const TOTAL = ALL.length;
+const CHEERS = ["Let's do this!","Great start!","You're on a roll!","Look at you go!","Halfway! Keep going!","So close!","Last few!","All done! You rock!"];
+const KEY = 'sofie-bath-v1';
+const today = () => new Date().toLocaleDateString('en-CA');
+
+let checked = new Set();
+try {
+  const s = JSON.parse(localStorage.getItem(KEY) || 'null');
+  if (s && s.day === today()) checked = new Set(s.checked || []);
+} catch(e){}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify({day:today(), checked:[...checked]})); } catch(e){} }
+
+const svgUse = (id,w,h,cls='') => `<svg class="ic ${cls}" width="${w}" height="${h}" aria-hidden="true"><use href="#${id}"/></svg>`;
+
+// Build zones
+const zonesEl = document.getElementById('zones');
+const stickersEl = document.getElementById('stickers');
+ZONES.forEach(z => {
+  const sec = document.createElement('section');
+  sec.className = 'zone'; sec.id = 'zone-' + z.id;
+  sec.innerHTML = `<div class="zone-head">${svgUse(z.art,z.w,z.h)}<div class="htext"><h2>${z.title}</h2><p class="tip">${z.tip}</p></div><span class="zone-badge" id="badge-${z.id}">0/${z.items.length}</span></div>
+  <div class="timer" id="tm-${z.id}"><button class="tbtn" data-z="${z.id}" aria-label="Start the ${z.title} timer">${svgUse('clock',22,22)}<span class="tbtn-l">Start timer</span></button><span class="tleft" aria-live="off">0:00</span><span class="tmsg"></span><div class="ttrack"><div class="tfill"></div></div></div>
+  <ul class="tasks">${z.items.map(([id,t,sub]) => `<li><button class="task" role="checkbox" aria-checked="false" id="t-${id}" data-id="${id}"><span class="box">${svgUse('smiley',36,36)}</span><span class="label">${t}${sub?`<small>${sub}</small>`:''}</span></button></li>`).join('')}</ul>`;
+  zonesEl.appendChild(sec);
+  const st = document.createElement('div');
+  st.className = 'sticker'; st.id = 'st-' + z.id; st.title = z.title;
+  st.innerHTML = svgUse(z.art, 30, 28);
+  stickersEl.appendChild(st);
+});
+
+zonesEl.addEventListener('click', e => {
+  const b = e.target.closest('.task'); if (!b) return;
+  const id = b.dataset.id;
+  if (checked.has(id)) checked.delete(id); else { checked.add(id); popAt(b.querySelector('.box')); }
+  save(); render(true);
+});
+
+let wasAll = false;
+function render(fromTap){
+  ALL.forEach(id => document.getElementById('t-'+id).setAttribute('aria-checked', checked.has(id)));
+  ZONES.forEach(z => {
+    const n = z.items.filter(i => checked.has(i[0])).length, full = n === z.items.length;
+    document.getElementById('badge-'+z.id).textContent = full ? 'Done!' : `${n}/${z.items.length}`;
+    const sec = document.getElementById('zone-'+z.id), st = document.getElementById('st-'+z.id);
+    if (full && !sec.classList.contains('complete') && fromTap) { st.classList.remove('pop'); void st.offsetWidth; st.classList.add('pop'); burst(40); }
+    sec.classList.toggle('complete', full); st.classList.toggle('got', full);
+  });
+  const n = checked.size;
+  document.getElementById('fill').style.width = (n/TOTAL*100) + '%';
+  document.getElementById('count').textContent = `${n} of ${TOTAL}`;
+  document.getElementById('cheer').textContent = CHEERS[Math.min(CHEERS.length-1, n===TOTAL ? 7 : Math.floor(n/TOTAL*7))];
+  const all = n === TOTAL;
+  const btn = document.getElementById('doneBtn');
+  if (!sent) btn.disabled = !all;
+  document.getElementById('finishTitle').textContent = all ? 'You did it!' : 'Almost there!';
+  document.getElementById('finishSub').textContent = all ? 'Your bathroom looks amazing. Tap the big button to tell Mom.' : `${TOTAL-n} more to go, then this button lights up.`;
+  if (all && !wasAll && fromTap) burst(140);
+  wasAll = all;
+}
+
+// Confetti: hearts, petals and stars
+const cv = document.getElementById('confetti'), cx = cv.getContext('2d');
+let parts = [], raf = 0;
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const COLORS = () => { const s = getComputedStyle(document.documentElement); return ['--accent','--petal','--sun','--mint','--accent-soft','--blush'].map(v => s.getPropertyValue(v).trim()); };
+function resize(){ cv.width = innerWidth*devicePixelRatio; cv.height = innerHeight*devicePixelRatio; }
+addEventListener('resize', resize); resize();
+function burst(count, x, y){
+  if (reduce) return;
+  const cols = COLORS();
+  x = x ?? innerWidth/2; y = y ?? innerHeight/3;
+  for (let i=0;i<count;i++){
+    const a = Math.random()*Math.PI*2, sp = 3 + Math.random()*7;
+    parts.push({x, y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp - 4, r:4+Math.random()*6, c:cols[i%cols.length], s:Math.floor(Math.random()*3), rot:Math.random()*6, life:90+Math.random()*40});
+  }
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function popAt(el){ const r = el.getBoundingClientRect(); burst(14, r.left+r.width/2, r.top+r.height/2); }
+function tick(){
+  const d = devicePixelRatio; cx.clearRect(0,0,cv.width,cv.height);
+  parts = parts.filter(p => p.life-- > 0);
+  parts.forEach(p => {
+    p.vy += .22; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.rot += .1;
+    cx.save(); cx.translate(p.x*d, p.y*d); cx.rotate(p.rot); cx.fillStyle = p.c; cx.globalAlpha = Math.min(1, p.life/30);
+    const r = p.r*d; cx.beginPath();
+    if (p.s===0){ cx.arc(0,0,r*.7,0,7); }
+    else if (p.s===1){ cx.moveTo(0,r*.9); cx.bezierCurveTo(-r*1.4,0,-r*.5,-r*1,0,-r*.3); cx.bezierCurveTo(r*.5,-r*1,r*1.4,0,0,r*.9); }
+    else { for(let i=0;i<8;i++){ const rr = i%2? r*.4 : r; const a = i*Math.PI/4; cx.lineTo(Math.cos(a)*rr, Math.sin(a)*rr); } }
+    cx.fill(); cx.restore();
+  });
+  raf = parts.length ? requestAnimationFrame(tick) : 0;
+  if (!raf) cx.clearRect(0,0,cv.width,cv.height);
+}
+
+// Texting Mom (iMessage). The number lives only on this iPad.
+let sent = false;
+const PHONE_KEY = 'mom-phone-v1';
+const statusEl = document.getElementById('status');
+function setStatus(t, cls=''){ statusEl.textContent = t; statusEl.className = 'status ' + cls; }
+function getPhone(){ try { return localStorage.getItem(PHONE_KEY) || ''; } catch(e){ return ''; } }
+function cleanAddr(v){
+  v = v.trim();
+  if (v.includes('@')) return v;
+  const plus = v.startsWith('+');
+  const digits = v.replace(/\D/g, '');
+  if (!digits) return '';
+  if (plus) return '+' + digits;
+  if (digits.length === 10) return '+1' + digits;
+  if (digits.length === 11 && digits[0] === '1') return '+' + digits;
+  return digits;
+}
+function openText(body){
+  const to = getPhone();
+  if (!to) return false;
+  location.href = 'sms:' + to + '&body=' + encodeURIComponent(body);
+  return true;
+}
+
+document.getElementById('doneBtn').addEventListener('click', () => {
+  const btn = document.getElementById('doneBtn');
+  if (checked.size !== TOTAL || sent) return;
+  const note = document.getElementById('note').value.trim();
+  const msg = "Mom, I finished cleaning my bathroom! I checked off all " + TOTAL + " things. Come look!" + (note ? "\n\n" + note : "");
+  if (!openText(msg)) { setStatus('Ask Mom to set up the text button (at the bottom of this page). Then go show her your bathroom!', 'err'); return; }
+  sent = true;
+  btn.hidden = true;
+  document.getElementById('noteWrap').hidden = true;
+  document.getElementById('yay').hidden = false;
+  burst(160);
+  setStatus('Messages is open. Tap the blue send arrow to tell Mom!', 'ok');
+});
+
+document.getElementById('againBtn').addEventListener('click', () => {
+  checked = new Set(); save(); sent = false; wasAll = false;
+  document.getElementById('note').value = '';
+  document.getElementById('noteWrap').hidden = false;
+  document.getElementById('doneBtn').hidden = false;
+  document.getElementById('yay').hidden = true;
+  setStatus(''); render(false); scrollTo({top:0, behavior: reduce ? 'auto' : 'smooth'});
+});
+
+// Grown-up setup
+const phoneInput = document.getElementById('momPhone'), phoneStatus = document.getElementById('phoneStatus');
+function phoneMsg(t, err){ phoneStatus.textContent = t; phoneStatus.style.color = err ? '#C2346E' : ''; }
+phoneInput.value = getPhone();
+document.getElementById('savePhone').addEventListener('click', () => {
+  const v = cleanAddr(phoneInput.value);
+  if (phoneInput.value.trim() && (!v || (!v.includes('@') && v.replace(/\D/g,'').length < 10))) { phoneMsg('That number looks too short. Include the area code.', true); return; }
+  try { if (v) localStorage.setItem(PHONE_KEY, v); else localStorage.removeItem(PHONE_KEY); }
+  catch(e){ phoneMsg('This browser would not save it. Open the page in Safari or from the home screen icon and try again.', true); return; }
+  phoneInput.value = v;
+  phoneMsg(v ? 'Saved on this iPad. Tap "Try it" to make sure Messages opens.' : 'Cleared.');
+});
+document.getElementById('testText').addEventListener('click', () => {
+  if (!openText('Test from the bathroom checklist. When Sofie finishes, you will get a text like this.')) phoneMsg('Save a number first.', true);
+  else phoneMsg('Messages should be open with a test text. Send it to check it arrives.');
+});
+
+// Section timers
+const MINS_KEY = 'bath-timer-mins-v1';
+let customMins = {};
+try { customMins = JSON.parse(localStorage.getItem(MINS_KEY) || '{}') || {}; } catch(e){}
+const minsFor = z => { const v = Number(customMins[z.id]); return v >= 1 && v <= 90 ? v : z.mins; };
+const timers = {}; // id -> {state:'idle'|'run'|'pause'|'up'|'beat', end, left}
+let tickId = 0, wakeLock = null, audioCtx = null;
+const fmt = s => { s = Math.max(0, Math.ceil(s)); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); };
+function zoneDone(z){ return z.items.every(i => checked.has(i[0])); }
+function resetTimer(z){ timers[z.id] = {state:'idle', left:minsFor(z)*60}; }
+ZONES.forEach(resetTimer);
+
+function chime(){
+  try {
+    if (!audioCtx) return;
+    [0, .25, .5].forEach((t, i) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.type = 'sine'; o.frequency.value = [784, 988, 1175][i];
+      g.gain.setValueAtTime(0.0001, audioCtx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.3, audioCtx.currentTime + t + .02);
+      g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + t + .4);
+      o.connect(g).connect(audioCtx.destination); o.start(audioCtx.currentTime + t); o.stop(audioCtx.currentTime + t + .45);
+    });
+  } catch(e){}
+}
+async function keepAwake(on){
+  try {
+    if (on && !wakeLock && navigator.wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); }
+    if (!on && wakeLock) { await wakeLock.release(); wakeLock = null; }
+  } catch(e){ wakeLock = null; }
+}
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && Object.values(timers).some(t => t.state === 'run')) keepAwake(true); });
+
+function remaining(t){ return t.state === 'run' ? (t.end - Date.now())/1000 : t.left; }
+function paintTimers(){
+  ZONES.forEach(z => {
+    const t = timers[z.id], el = document.getElementById('tm-'+z.id);
+    const total = minsFor(z)*60, rem = remaining(t);
+    const btn = el.querySelector('.tbtn'), lbl = el.querySelector('.tbtn-l'), msg = el.querySelector('.tmsg');
+    el.querySelector('.tleft').textContent = t.state === 'beat' ? fmt(t.left) : fmt(rem);
+    el.querySelector('.tfill').style.width = (t.state === 'up' ? 0 : Math.max(0, rem/total*100)) + '%';
+    el.classList.toggle('urgent', t.state === 'run' && rem <= 60);
+    el.classList.toggle('up', t.state === 'up');
+    el.classList.toggle('beat', t.state === 'beat');
+    btn.classList.toggle('running', t.state === 'run');
+    btn.hidden = t.state === 'beat' || (t.state === 'idle' && zoneDone(z));
+    lbl.textContent = t.state === 'run' ? 'Pause' : t.state === 'pause' ? 'Keep going' : t.state === 'up' ? 'Restart timer' : 'Start timer';
+    msg.textContent = {
+      idle: zoneDone(z) ? 'Section done!' : `${minsFor(z)} minutes for this section`,
+      run: rem <= 60 ? 'Last minute! Hurry hurry!' : 'Go go go!',
+      pause: 'Paused',
+      up: "Time's up! Finish this section, then move on.",
+      beat: `You beat the clock with ${fmt(t.left)} to spare!`,
+    }[t.state];
+  });
+}
+function timerTick(){
+  let anyRun = false;
+  ZONES.forEach(z => {
+    const t = timers[z.id];
+    if (t.state !== 'run') return;
+    if (remaining(t) <= 0) { t.state = 'up'; t.left = 0; chime(); }
+    else anyRun = true;
+  });
+  paintTimers();
+  if (!anyRun) { clearInterval(tickId); tickId = 0; keepAwake(false); }
+}
+function startTicking(){ if (!tickId) tickId = setInterval(timerTick, 250); keepAwake(true); }
+
+zonesEl.addEventListener('click', e => {
+  const b = e.target.closest('.tbtn'); if (!b) return;
+  const z = ZONES.find(x => x.id === b.dataset.z), t = timers[z.id];
+  try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); audioCtx.resume(); } catch(e){}
+  if (t.state === 'run') { t.left = remaining(t); t.state = 'pause'; paintTimers(); return; }
+  // one timer at a time: pause any other running one
+  ZONES.forEach(o => { const ot = timers[o.id]; if (o.id !== z.id && ot.state === 'run') { ot.left = remaining(ot); ot.state = 'pause'; } });
+  if (t.state === 'up' || t.state === 'idle') t.left = minsFor(z)*60;
+  t.end = Date.now() + t.left*1000; t.state = 'run';
+  startTicking(); paintTimers();
+});
+
+// When a section gets finished, stop its clock and celebrate beating it
+function checkBeat(){
+  ZONES.forEach(z => {
+    const t = timers[z.id];
+    if ((t.state === 'run' || t.state === 'pause') && zoneDone(z)) { t.left = remaining(t); t.state = 'beat'; }
+    if (t.state === 'beat' && !zoneDone(z)) { t.state = 'pause'; }
+  });
+  paintTimers();
+}
+zonesEl.addEventListener('click', e => { if (e.target.closest('.task')) checkBeat(); });
+
+document.getElementById('againBtn').addEventListener('click', () => { ZONES.forEach(resetTimer); keepAwake(false); paintTimers(); });
+
+// Grown-up minute settings
+const minsGrid = document.getElementById('minsGrid');
+ZONES.forEach(z => {
+  const l = document.createElement('label');
+  l.innerHTML = `<span></span><input type="number" inputmode="numeric" min="1" max="90" id="mins-${z.id}">`;
+  l.firstChild.textContent = z.title;
+  const inp = l.querySelector('input'); inp.value = minsFor(z);
+  inp.addEventListener('change', () => {
+    const v = Math.round(Number(inp.value));
+    if (!(v >= 1 && v <= 90)) { inp.value = minsFor(z); document.getElementById('minsStatus').textContent = 'Pick between 1 and 90 minutes.'; return; }
+    customMins[z.id] = v;
+    try { localStorage.setItem(MINS_KEY, JSON.stringify(customMins)); } catch(e){}
+    if (timers[z.id].state === 'idle') resetTimer(z);
+    document.getElementById('minsStatus').textContent = `${z.title} is now ${v} minutes.`;
+    paintTimers();
+  });
+  minsGrid.appendChild(l);
+});
+
+render(false);
+paintTimers();
+</script>
+</body>
+</html>
