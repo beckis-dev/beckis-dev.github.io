@@ -241,7 +241,7 @@ details.grown summary{cursor:pointer; font-weight:800; color:var(--ink-soft)}
 
   <div class="progress" role="status" aria-live="polite">
     <div class="bar">
-      <div class="bar-top"><span id="cheer">Let's do this!</span><span class="count" id="count">0 of 29</span></div>
+      <div class="bar-top"><span id="cheer">Let's do this!</span><span class="count" id="count">0 of 31</span></div>
       <div class="track"><div class="fill" id="fill"></div></div>
     </div>
     <div class="stickers" id="stickers"></div>
@@ -299,14 +299,15 @@ details.grown summary{cursor:pointer; font-weight:800; color:var(--ink-soft)}
 const ZONES = [
   { id:'counter', mins:8, title:'Counter & Mirror', art:'flower', w:52, h:52, tip:'Clear it, wipe it, make it shine.', items:[
     ['c1','Toothbrush and toothpaste put away'],
-    ['c2','Hairbrush, hair ties and clips back where they live'],
-    ['c3','Trash off the counter','Floss, wrappers and empty bottles go in the trash can.'],
+    ['c2','Hairbrush, hair ties, clips and makeup back where they live'],
+    ['c3','Trash off the counter','All trash goes in the trash can.'],
     ['c4','Spray and wipe the counter','Disinfecting spray and a paper towel. Lift things up and wipe under them too.'],
     ['c5','Spray and wipe the sink','Get all the toothpaste out.'],
     ['c6','Spray and wipe the faucet until it shines'],
     ['c7','Clean the mirror','Glass cleaner and a paper towel. Wipe until there are no spots or streaks.'],
   ]},
-  { id:'toilet', mins:5, title:'Toilet', art:'cat', w:58, h:53, tip:'Quick and squeaky clean. Top to bottom!', items:[
+  { id:'toilet', mins:8, title:'Toilet', art:'cat', w:58, h:53, tip:'Quick and squeaky clean. Top to bottom!', items:[
+    ['t0','Spray toilet bowl cleaner around the top edge of the bowl'],
     ['t1','Scrub inside the bowl with the toilet brush','Brush goes back in its holder when you\'re done.'],
     ['t2','Spray and wipe the top of the tank and the handle','Disinfecting spray and a paper towel.'],
     ['t3','Spray and wipe the lid and the seat, top and bottom'],
@@ -319,22 +320,23 @@ const ZONES = [
     ['s3','Hair out of the drain','Pull it out with a paper towel and toss it in the trash.'],
     ['s4','Spray the tub and the shower walls','Use the disinfecting spray.'],
     ['s5','Wipe the tub and walls with paper towels','Don\'t forget the ring around the tub!'],
-    ['s6','Hang up your washcloth or loofah to dry'],
+    ['s6','Hang up your loofah to dry'],
     ['s7','Close the shower curtain so it can dry'],
   ]},
   { id:'hamper', mins:5, title:'Hamper', art:'puppy', w:58, h:53, tip:'Every sock finds its way home.', items:[
     ['h1','Dirty clothes and pajamas in the hamper','Hamper full? Bring it downstairs and start a load in the washer.'],
-    ['h2','Hang up your towels to dry','Wet towels on the floor get stinky!'],
+    ['h2','Hang up your towels to dry','If your towel is in your room, go get it and hang it up in the bathroom.'],
     ['h3','Nothing hanging out of the hamper'],
   ]},
   { id:'floor', mins:10, title:'Floor & Sparkle Finish', art:'smiley', w:48, h:48, tip:'Floor last, so all the crumbs and hair are gone for good.', items:[
     ['f1','Pick up everything on the floor'],
     ['f2','Shake out the bath mat and hang it on the tub','Put it back down once the floor is dry.'],
+    ['f4','Empty your trash can into the big can in the garage','While you\'re downstairs, bring the vacuum and mop up with you.'],
     ['f3','Vacuum the floor'],
     ['f3b','Mop the floor'],
-    ['f4','Empty your trash can into the big can in the garage'],
     ['f5','Turn off the light and the fan'],
     ['f6','Stand at the door and look. Does it sparkle?'],
+    ['f7','Bring the vacuum and mop back downstairs'],
   ]},
 ];
 const ALL = ZONES.flatMap(z => z.items.map(i => i[0]));
